@@ -60,7 +60,7 @@ public class TrainersController : ControllerBase
     {
         try
         {
-            return Ok(_trainerRepository.ReadInfoId(id, _clientRepository));
+            return Ok(_trainerRepository.ReadInfoId(id));
         }
         catch (Exception ex)
         {

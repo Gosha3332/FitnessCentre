@@ -39,8 +39,9 @@
     }
     public bool IsActive { get; set; } = true;
     public Guid? TrainerId { get; set; }
+    public Guid? LockerId { get; set; }
 
-    public Client(string surname, string name, string? patronymic, DateTime birthday, string phone, string email, bool isActive, Guid? trainerId)
+    public Client(string surname, string name, string? patronymic, DateTime birthday, string phone, string email, bool isActive, Guid? trainerId, Guid? lockerId)
     {
         Id = Guid.NewGuid();
         Surname = surname;
@@ -51,5 +52,6 @@
         Email = email;
         IsActive = isActive;
         TrainerId = trainerId;
+        LockerId = lockerId;
     }
 }

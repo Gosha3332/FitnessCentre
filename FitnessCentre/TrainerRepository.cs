@@ -1,15 +1,21 @@
 ﻿public class TrainerRepository
 {
-    private List<Trainer> _treiners = new List<Trainer>();
+    private readonly AppDbContext _context;
+
+    public TrainerRepository(AppDbContext context)
+    {
+        _context = context;
+    }
 
     public void Create(string surname, string name, string? patronimic, string phone, Status status)
     {
-        _treiners.Add(new Trainer(surname, name, patronimic, phone, status));
+        _context.Trainers.Add(new Trainer(surname, name, patronimic, phone, status));
+        _context.SaveChanges();
     }
 
     public void Update(Guid id, string surname, string name, string? patronimic, string phone, Status status)
     {
-        Trainer? trainer = _treiners.FirstOrDefault(c => c.Id == id);
+        Trainer? trainer = _context.Trainers.FirstOrDefault(c => c.Id == id);
 
         if (trainer == null) { throw new Exception("Тренера с подобным идентификатором не найден"); }
 
@@ -18,29 +24,32 @@
         trainer.Patronimic = patronimic;
         trainer.Phone = phone;
         trainer.Status = status;
+
+        _context.SaveChanges();
     }
 
     public void UpdateStatus(Guid id, Status status)
     {
-        Trainer? trainer = _treiners.FirstOrDefault(c => c.Id == id);
+        Trainer? trainer = _context.Trainers.FirstOrDefault(c => c.Id == id);
 
         if (trainer == null) { throw new Exception("Тренера с подобным идентификатором не найден"); }
 
         trainer.Status = status;
+        _context.SaveChanges();
     }
 
-    public TrainerWithClientsDto ReadInfoId(Guid id, ClientRepository clientRepo)
+    public TrainerWithClientsDto ReadInfoId(Guid id)
     {
-        Trainer? trainer = _treiners.FirstOrDefault(c => c.Id == id);
+        Trainer? trainer = _context.Trainers.FirstOrDefault(c => c.Id == id);
 
         if (trainer == null) { throw new Exception("Тренера с подобным идентификатором не найден"); }
 
-        List<Client> clientsForTrainer = clientRepo.ReadAll().Where(c => c.TrainerId == id).ToList();
+        List<Client> clientsForTrainer = _context.Clients.Where(c => c.TrainerId == id).ToList();
 
         return new TrainerWithClientsDto { Trainer = trainer, Clients = clientsForTrainer };
     }
 
-    public List<Trainer> ReadAll() { return _treiners; }
+    public List<Trainer> ReadAll() { return _context.Trainers.ToList(); }
 }
 
 public class TrainerWithClientsDto

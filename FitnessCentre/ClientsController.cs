@@ -6,7 +6,8 @@ public class ClientsController : ControllerBase
 {
     private readonly ClientRepository _clientRepository;
     private readonly TrainerRepository _trainerRepository;
-
+    private readonly LockerRepository _lockerRepository;
+    private readonly ServiсeRepository _serviceRepository;
     public ClientsController(ClientRepository clientRepository, TrainerRepository trainerRepository)
     {
         _clientRepository = clientRepository;
@@ -18,7 +19,7 @@ public class ClientsController : ControllerBase
     {
         try
         {
-            _clientRepository.Create(dto.Surname, dto.Name, dto.Patronymic, dto.Birthday, dto.Phone, dto.Email, dto.IsActive, dto.TrainerId);
+            _clientRepository.Create(dto.Surname, dto.Name, dto.Patronymic, dto.Birthday, dto.Phone, dto.Email, dto.IsActive, dto.TrainerId, dto.LockerId);
             return Ok();
         }
         catch (ArgumentException ex)
@@ -32,7 +33,7 @@ public class ClientsController : ControllerBase
     {
         try
         {
-            _clientRepository.Update(id, dto.Surname, dto.Name, dto.Patronymic, dto.Birthday, dto.Phone, dto.Email, dto.IsActive, dto.TrainerId);
+            _clientRepository.Update(id, dto.Surname, dto.Name, dto.Patronymic, dto.Birthday, dto.Phone, dto.Email, dto.IsActive, dto.TrainerId, dto.LockerId);
             return Ok();
         }
         catch (Exception ex)
@@ -65,7 +66,7 @@ public class ClientsController : ControllerBase
     {
         try
         {
-            return Ok(_clientRepository.ReadDeatilInfoId(id, _trainerRepository));
+            return Ok(_clientRepository.ReadDeatilInfoId(id));
         }
         catch (Exception ex)
         {
@@ -92,12 +93,40 @@ public class ClientsController : ControllerBase
     {
         try
         {
-            _clientRepository.AddTreinerForClient(clientId, trainerId, _trainerRepository);
+            _clientRepository.AddTreinerForClient(clientId, trainerId);
             return Ok();
         }
         catch (Exception ex)
         {
             return NotFound(ex.Message);
+        }
+    }
+
+    [HttpPost("{clientId}/locker/{lockerId}")]
+    public IActionResult AssignLocker(Guid clientId, Guid lockerId)
+    {
+        try
+        {
+            _clientRepository.AssignLocker(clientId, lockerId);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("{clientId}/additionalServices/{serviceId}")]
+    public IActionResult AddService(Guid clientId, string serviceId)
+    {
+        try
+        {
+            _clientRepository.AddService(clientId, serviceId, _serviceRepository);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
     }
 }
@@ -112,6 +141,7 @@ public class CreateClientDto
     public string Email { get; set; }
     public bool IsActive { get; set; } = true;
     public Guid? TrainerId { get; set; }
+    public Guid? LockerId { get; set; }
 }
 
 public class UpdateClientDto
@@ -124,6 +154,7 @@ public class UpdateClientDto
     public string Email { get; set; }
     public bool IsActive { get; set; }
     public Guid? TrainerId { get; set; }
+    public Guid? LockerId { get; set; }
 }
 
 public class SetStatusDto
