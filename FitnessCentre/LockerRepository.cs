@@ -18,6 +18,7 @@ public class LockerRepository
     {
         return _context.Lockers.Select(l => new LockerInfoDTO
         {
+            Id = l.Id,
             Number = l.Number,
             LibertyStatus = l.ClientId == null
         }).ToList();
@@ -31,6 +32,7 @@ public class LockerRepository
 
 public class LockerInfoDTO
 {
+    public Guid Id { get; set; }
     public int Number { get; set; }
     public bool LibertyStatus { get; set; }
 }
